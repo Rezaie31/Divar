@@ -2,7 +2,7 @@
 <html lang="fa">
 <head>
     <meta charset="UTF-8">
-    <title>پنل مدیریت | دیوار اصفهان</title>
+    <title>پنل مدیریت آگهی‌ها</title>
     <style>
         body {
             font-family: Tahoma, sans-serif;
@@ -10,10 +10,6 @@
             color: white;
             direction: rtl;
             padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
         }
         .card {
             background: #1e293b;
@@ -41,54 +37,46 @@
             padding: 10px 20px;
             border-radius: 10px;
             cursor: pointer;
-            margin: 5px;
-        }
-        .btn-secondary {
-            background: #3b82f6;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="card">
-        <h1>🔐 پنل مدیریت آگهی‌ها</h1>
-        <div id="loginBox">
-            <input type="password" id="adminPass" placeholder="رمز پنل">
-            <button class="btn" onclick="checkAdminPass()">ورود</button>
-        </div>
-        <div id="panel" style="display: none;">
-            <button class="btn btn-secondary" onclick="loadAds()">🔄 نمایش آگهی‌ها</button>
-            <div id="adsList"></div>
-        </div>
+<div class="card">
+    <h1>🔐 پنل مدیریت آگهی‌ها</h1>
+    <div id="loginBox">
+        <input type="password" id="adminPass" placeholder="رمز پنل">
+        <button class="btn" onclick="checkAdminPass()">ورود</button>
+    </div>
+    <div id="panel" style="display:none;">
+        <button class="btn" onclick="loadAds()">🔄 نمایش آگهی‌ها</button>
+        <div id="adsList"></div>
     </div>
 </div>
 
 <script>
-    const SHEET_ID = "12JXj1Tddq7XGAJFdliqcSr1vjU_fODBqMeF2AlffhWI";
-    const API_KEY = "AIzaSyB_WO5bJirOwxzqKj4bfQRWrj6ZpTgAKzw"; // کلید عمومی گوگل شیت
+    // آدرس Web App جدید
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxm8KgZ0521jsJUGe-XeGbtbewDeZ_ak0EE4N9YzqeGduKPnxPksVzNSCWY6pYrxp2p/exec";
 
     async function loadAds() {
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1?key=${API_KEY}`;
-        const res = await fetch(url);
+        const res = await fetch(SCRIPT_URL);
         const data = await res.json();
-        const rows = data.values;
-        if (!rows || rows.length < 2) {
+        if (!data || data.length < 2) {
             document.getElementById("adsList").innerHTML = "<p>هیچ آگهی ثبت نشده.</p>";
             return;
         }
-        let html = '<table><thead><tr>' + rows[0].map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
-        for (let i = 1; i < rows.length; i++) {
+        let html = '<table><thead><tr>' + data[0].map(h => `<th>${h}</th>`).join('') + '</thead><tbody>';
+        for (let i = 1; i < data.length; i++) {
             html += '<tr>';
-            for (let j = 0; j < rows[i].length; j++) {
-                let cell = rows[i][j];
-                if (j === 7 && cell) { // ستون عکس
+            for (let j = 0; j < data[i].length; j++) {
+                let cell = data[i][j];
+                if (j === 7 && cell && cell.startsWith('data:image')) {
                     cell = `<img src="${cell}" width="100">`;
                 }
                 html += `<td>${cell || ''}</td>`;
             }
             html += '</tr>';
         }
-        html += '</tbody></table>';
+        html += '</tbody>樹脂';
         document.getElementById("adsList").innerHTML = html;
     }
 
