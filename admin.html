@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>پنل مدیریت | دیوار اصفهان</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            background: #0f172a;
+            color: white;
+            direction: rtl;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #475569;
+            padding: 10px;
+            text-align: center;
+        }
+        img {
+            max-width: 100px;
+            border-radius: 10px;
+        }
+        .btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn-secondary {
+            background: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>🔐 پنل مدیریت آگهی‌ها</h1>
+        <div id="loginBox">
+            <input type="password" id="adminPass" placeholder="رمز پنل">
+            <button class="btn" onclick="checkAdminPass()">ورود</button>
+        </div>
+        <div id="panel" style="display: none;">
+            <button class="btn btn-secondary" onclick="loadAds()">🔄 نمایش آگهی‌ها</button>
+            <div id="adsList"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SHEET_ID = "12JXj1Tddq7XGAJFdliqcSr1vjU_fODBqMeF2AlffhWI";
+    const API_KEY = "AIzaSyB_WO5bJirOwxzqKj4bfQRWrj6ZpTgAKzw"; // کلید عمومی گوگل شیت
+
+    async function loadAds() {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1?key=${API_KEY}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const rows = data.values;
+        if (!rows || rows.length < 2) {
+            document.getElementById("adsList").innerHTML = "<p>هیچ آگهی ثبت نشده.</p>";
+            return;
+        }
+        let html = '<table><thead><tr>' + rows[0].map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+        for (let i = 1; i < rows.length; i++) {
+            html += '<tr>';
+            for (let j = 0; j < rows[i].length; j++) {
+                let cell = rows[i][j];
+                if (j === 7 && cell) { // ستون عکس
+                    cell = `<img src="${cell}" width="100">`;
+                }
+                html += `<td>${cell || ''}</td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        document.getElementById("adsList").innerHTML = html;
+    }
+
+    window.checkAdminPass = () => {
+        const pwd = document.getElementById("adminPass").value;
+        if (pwd === "0101") {
+            document.getElementById("loginBox").style.display = "none";
+            document.getElementById("panel").style.display = "block";
+            loadAds();
+        } else {
+            alert("رمز اشتباه است");
+        }
+    };
+</script>
+</body>
+</html>
