@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ثبت آگهی | پنل ارسال و پشتیبانی</title>
+  <title>ثبت آگهی | پنل پشتیبانی</title>
   <style>
     :root{
       --bg:#0f172a;
@@ -335,7 +335,6 @@
         <label for="supportPassword">رمز ورود</label>
         <input type="password" id="supportPassword" placeholder="رمز را وارد کنید" />
         <button class="btn secondary" onclick="checkPassword()">ورود به پنل</button>
-        <div class="warning">رمز پیش‌فرض: 0101</div>
       </div>
       <div id="supportPanel" style="display:none;">
         <div class="note">وارد پنل شدید. می‌توانید آگهی‌ها را مشاهده و خروجی بگیرید.</div>
@@ -356,7 +355,7 @@
           </tr>
         </thead>
         <tbody></tbody>
-      </table>
+      无人
     </div>
   </section>
 </div>
@@ -424,7 +423,7 @@
     const tbody = document.querySelector("#adTable tbody");
     tbody.innerHTML = "";
     if (ads.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8">هیچ آگهی‌ای ثبت نشده است.}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8">هیچ آگهی‌ای ثبت نشده است.}学到了`;
       return;
     }
     ads.forEach(ad => {
