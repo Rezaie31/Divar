@@ -1,212 +1,119 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <title>ثبت آگهی | پنل پشتیبان</title>
-  <style>
-    :root{
-      --bg:#0f172a;
-      --card:#111827;
-      --text:#e5e7eb;
-      --primary:#ef4444;
-      --border:#374151;
-      --radius:18px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Tahoma, Arial, sans-serif;
-      background: linear-gradient(135deg, #0f172a, #111827);
-      color:var(--text);
-      direction:rtl;
-      padding:20px;
-    }
-    .container{width:90%; max-width:1100px; margin:0 auto;}
-    .card{
-      background:rgba(17,24,39,.9);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:var(--radius);
-      padding:22px;
-      margin-bottom:20px;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:20px;
-    }
-    input, select, textarea{
-      width:100%;
-      background:#0b1220;
-      border:1px solid var(--border);
-      color:white;
-      padding:12px;
-      border-radius:12px;
-    }
-    .btn{
-      background:linear-gradient(135deg, #ef4444, #dc2626);
-      color:white;
-      border:none;
-      padding:12px;
-      border-radius:12px;
-      cursor:pointer;
-      width:100%;
-      margin-top:15px;
-    }
-    .btn.secondary{background:#2563eb;}
-    .success{
-      background:#22c55e;
-      color:white;
-      padding:12px;
-      border-radius:12px;
-      display:none;
-      margin-top:15px;
-    }
-    .warning{background:#f59e0b; color:black; padding:12px; border-radius:12px; margin-bottom:15px;}
-    table{width:100%; border-collapse:collapse;}
-    th,td{padding:10px; border-bottom:1px solid rgba(255,255,255,.1);}
-    img{max-width:80px; border-radius:8px;}
-    @media (max-width:700px){.grid{grid-template-columns:1fr;}}
-  </style>
+    <meta charset="UTF-8">
+    <title>ثبت آگهی | پنل پشتیبان</title>
+    <style>
+        body { font-family: Tahoma; background: #0f172a; color: white; direction: rtl; padding: 20px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
+        input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: none; }
+        button { background: #ef4444; color: white; padding: 10px; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        .success { background: #22c55e; padding: 10px; border-radius: 8px; display: none; margin-top: 10px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        td, th { border: 1px solid #475569; padding: 8px; text-align: center; }
+        img { max-width: 80px; }
+        .btn-secondary { background: #3b82f6; }
+    </style>
 </head>
 <body>
-<div class="container">
-  <div class="card">
-    <h1>📢 ثبت آگهی در دیوار اصفهان</h1>
-    <p>هزینه ثبت آگهی: <strong>۵۰,۰۰۰ تومان</strong></p>
-  </div>
+<div class="card">
+    <h1>ثبت آگهی در دیوار اصفهان</h1>
+    <p>هزینه: ۵۰,۰۰۰ تومان</p>
+</div>
 
-  <div class="grid">
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
     <div class="card">
-      <h2>فرم ثبت آگهی</h2>
-      <form id="adForm">
-        <label>نام</label>
-        <input type="text" id="name" required>
-        <label>نام خانوادگی</label>
-        <input type="text" id="family" required>
-        <label>شماره همراه</label>
-        <input type="tel" id="phone" pattern="09[0-9]{9}" required>
-        <label>نوع آگهی</label>
-        <select id="adType">
-          <option>فروش کالا</option><option>خدمات</option><option>استخدام</option><option>ملک</option>
-        </select>
-        <label>توضیحات</label>
-        <textarea id="details" rows="4" required></textarea>
-        <label>تصویر رسید</label>
-        <input type="file" id="receipt" accept="image/*" required>
-        <button class="btn" type="submit">✅ ثبت آگهی</button>
-        <div id="successMsg" class="success">درخواست شما ثبت شد و به پشتیبان ارسال گردید.</div>
-      </form>
+        <h2>فرم ثبت آگهی</h2>
+        <form id="adForm">
+            <input type="text" id="name" placeholder="نام" required>
+            <input type="text" id="family" placeholder="نام خانوادگی" required>
+            <input type="tel" id="phone" placeholder="شماره همراه" required>
+            <select id="adType">
+                <option>فروش کالا</option><option>خدمات</option><option>استخدام</option><option>ملک</option>
+            </select>
+            <textarea id="details" rows="4" placeholder="توضیحات آگهی"></textarea>
+            <input type="file" id="receipt" accept="image/*" required>
+            <button type="submit">ثبت آگهی</button>
+            <div id="successMsg" class="success">آگهی شما ثبت شد.</div>
+        </form>
     </div>
 
     <div class="card">
-      <h2>🔐 پنل پشتیبان</h2>
-      <div id="loginBox">
-        <label>رمز پنل</label>
-        <input type="password" id="adminPass" placeholder="رمز 4 رقمی">
-        <button class="btn secondary" onclick="loginToPanel()">ورود</button>
-        <div class="warning">رمز پیش‌فرض: 0101</div>
-      </div>
-      <div id="panelArea" style="display:none;">
-        <button class="btn secondary" onclick="loadAds()">📥 دریافت لیست آگهی‌ها</button>
-        <button class="btn secondary" onclick="exportAds()">📥 خروجی گرفتن (JSON)</button>
-        <div id="adsList"></div>
-      </div>
+        <h2>پنل پشتیبان</h2>
+        <div id="loginBox">
+            <input type="password" id="adminPass" placeholder="رمز پنل">
+            <button onclick="login()">ورود</button>
+            <p>رمز پیش‌فرض: 0101</p>
+        </div>
+        <div id="panelArea" style="display: none;">
+            <button class="btn-secondary" onclick="exportToJSON()">📥 خروجی گرفتن از آگهی‌ها</button>
+            <button class="btn-secondary" onclick="loadAds()">🔄 نمایش آگهی‌ها</button>
+            <div id="adsList" style="margin-top: 15px;"></div>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
-  // ذخیره و بازیابی آگهی‌ها از localStorage
-  function getAds() {
-    return JSON.parse(localStorage.getItem("divar_ads") || "[]");
-  }
+    let ads = JSON.parse(localStorage.getItem("divar_ads") || "[]");
 
-  function saveAds(ads) {
-    localStorage.setItem("divar_ads", JSON.stringify(ads));
-  }
+    function saveAds() { localStorage.setItem("divar_ads", JSON.stringify(ads)); }
 
-  // تبدیل عکس به Base64
-  function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+    document.getElementById("adForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const file = document.getElementById("receipt").files[0];
+        if (!file) return alert("عکس رسید رو انتخاب کن");
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            ads.unshift({
+                id: Date.now(),
+                name: document.getElementById("name").value,
+                family: document.getElementById("family").value,
+                phone: document.getElementById("phone").value,
+                adType: document.getElementById("adType").value,
+                details: document.getElementById("details").value,
+                receipt: ev.target.result,
+                status: "در انتظار بررسی",
+                date: new Date().toLocaleString("fa-IR")
+            });
+            saveAds();
+            document.getElementById("successMsg").style.display = "block";
+            setTimeout(() => document.getElementById("successMsg").style.display = "none", 3000);
+            document.getElementById("adForm").reset();
+        };
+        reader.readAsDataURL(file);
     });
-  }
 
-  // ثبت آگهی جدید
-  document.getElementById('adForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('name').value;
-    const family = document.getElementById('family').value;
-    const phone = document.getElementById('phone').value;
-    const adType = document.getElementById('adType').value;
-    const details = document.getElementById('details').value;
-    const file = document.getElementById('receipt').files[0];
-
-    if(!file) { alert("لطفاً رسید را آپلود کن"); return; }
-    const receiptBase64 = await fileToBase64(file);
-    const newAd = {
-      id: Date.now(),
-      name, family, phone, adType, details,
-      receipt: receiptBase64,
-      status: "در انتظار بررسی",
-      createdAt: new Date().toLocaleString('fa-IR')
+    window.login = () => {
+        if (document.getElementById("adminPass").value === "0101") {
+            document.getElementById("loginBox").style.display = "none";
+            document.getElementById("panelArea").style.display = "block";
+            loadAds();
+        } else alert("رمز اشتباه است");
     };
 
-    const ads = getAds();
-    ads.unshift(newAd);
-    saveAds(ads);
+    window.loadAds = () => {
+        const list = document.getElementById("adsList");
+        if (!ads.length) { list.innerHTML = "<p>هیچ آگهی ثبت نشده</p>"; return; }
+        let html = '</table><thead><tr><th>نام</th><th>تلفن</th><th>نوع</th><th>توضیحات</th><th>رسید</th><th>وضعیت</th></tr></thead><tbody>';
+        ads.forEach(a => {
+            html += `<tr><td>${a.name} ${a.family}</td><td>${a.phone}</td><td>${a.adType}</td><td>${a.details}</td>
+                     <td><img src="${a.receipt}" width="80"></td><td>${a.status}</td></tr>`;
+        });
+        html += `</tbody>對</table>`;
+        list.innerHTML = html;
+    };
 
-    document.getElementById('successMsg').style.display = 'block';
-    setTimeout(() => document.getElementById('successMsg').style.display = 'none', 4000);
-    document.getElementById('adForm').reset();
-  });
-
-  // نمایش آگهی‌ها در پنل
-  window.loadAds = () => {
-    const ads = getAds();
-    const adsListDiv = document.getElementById('adsList');
-    if(ads.length === 0) {
-      adsListDiv.innerHTML = "<div class='warning'>هیچ آگهی ثبت نشده است.</div>";
-      return;
-    }
-    let html = `<div class="card"><table><thead><tr><th>نام</th><th>تلفن</th><th>نوع</th><th>توضیحات</th><th>رسید</th><th>وضعیت</th></thead><tbody>`;
-    ads.forEach(ad => {
-      html += `<tr>
-        <td>${ad.name} ${ad.family}</td><td>${ad.phone}</td><td>${ad.adType}</td><td>${ad.details}</td>
-        <td><img src="${ad.receipt}" alt="رسید" width="80"></td><td>${ad.status}</td>
-      </tr>`;
-    });
-    html += `</tbody></table></div>`;
-    adsListDiv.innerHTML = html;
-  };
-
-  // خروجی گرفتن از آگهی‌ها (برای پشتیبان)
-  window.exportAds = () => {
-    const ads = getAds();
-    const dataStr = JSON.stringify(ads, null, 2);
-    const blob = new Blob([dataStr], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ads_${new Date().toISOString()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  // ورود به پنل
-  window.loginToPanel = () => {
-    const pass = document.getElementById('adminPass').value;
-    if(pass === "0101") {
-      document.getElementById('loginBox').style.display = 'none';
-      document.getElementById('panelArea').style.display = 'block';
-      loadAds();
-    } else {
-      alert("رمز اشتباه است.");
-    }
-  };
+    window.exportToJSON = () => {
+        const dataStr = JSON.stringify(ads, null, 2);
+        const blob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ads_${new Date().toISOString()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        alert("فایل دانلود شد. میتونی توی هر دستگاهی ذخیره‌اش کنی.");
+    };
 </script>
 </body>
 </html>
