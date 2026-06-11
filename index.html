@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ثبت آگهی | پنل ارسال و پشتیبانی</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --card:#111827;
+      --card2:#1f2937;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --primary:#ef4444;
+      --primary2:#dc2626;
+      --success:#22c55e;
+      --warning:#f59e0b;
+      --border:#374151;
+      --input:#0b1220;
+      --shadow:0 15px 40px rgba(0,0,0,.25);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Tahoma, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(239,68,68,.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(59,130,246,.18), transparent 25%),
+        linear-gradient(180deg, #0b1020 0%, #111827 100%);
+      color:var(--text);
+      direction:rtl;
+    }
+
+    .container{
+      width:min(1100px, 92%);
+      margin:0 auto;
+      padding:24px 0 48px;
+    }
+
+    .hero{
+      background:linear-gradient(135deg, rgba(239,68,68,.18), rgba(17,24,39,.9));
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:var(--shadow);
+      border-radius:24px;
+      padding:28px;
+      margin-top:18px;
+    }
+
+    .hero h1{
+      margin:0 0 10px;
+      font-size:clamp(24px, 4vw, 38px);
+    }
+
+    .hero p{
+      margin:8px 0;
+      color:var(--muted);
+      line-height:1.9;
+    }
+
+    .badge-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+
+    .badge{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:14px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:22px;
+      margin-top:22px;
+    }
+
+    .card{
+      background:rgba(17,24,39,.92);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+      padding:22px;
+      backdrop-filter: blur(10px);
+    }
+
+    .card h2{
+      margin:0 0 16px;
+      font-size:22px;
+    }
+
+    .subtext{
+      color:var(--muted);
+      line-height:1.9;
+      margin-top:-4px;
+      margin-bottom:18px;
+      font-size:14px;
+    }
+
+    .price-box{
+      background:linear-gradient(135deg, rgba(239,68,68,.16), rgba(245,158,11,.12));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:14px 16px;
+      margin-bottom:18px;
+      line-height:1.9;
+    }
+
+    .price-box strong{color:#fff}
+
+    label{
+      display:block;
+      margin:14px 0 8px;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--border);
+      background:var(--input);
+      color:var(--text);
+      border-radius:14px;
+      padding:14px 14px;
+      outline:none;
+      transition:.2s;
+      font-size:15px;
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color:#ef4444;
+      box-shadow:0 0 0 4px rgba(239,68,68,.12);
+    }
+
+    textarea{resize:vertical; min-height:120px}
+
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px 16px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+      color:white;
+      background:linear-gradient(135deg, var(--primary), var(--primary2));
+      transition:.2s;
+      margin-top:18px;
+    }
+    .btn:hover{transform:translateY(-1px); filter:brightness(1.05)}
+
+    .btn.secondary{
+      background:linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+
+    .note{
+      margin-top:14px;
+      padding:14px 16px;
+      border-radius:14px;
+      background:rgba(34,197,94,.09);
+      border:1px solid rgba(34,197,94,.18);
+      color:#d1fae5;
+      line-height:1.9;
+      font-size:14px;
+    }
+
+    .warning{
+      margin-top:14px;
+      padding:14px 16px;
+      border-radius:14px;
+      background:rgba(245,158,11,.1);
+      border:1px solid rgba(245,158,11,.2);
+      color:#fef3c7;
+      line-height:1.9;
+      font-size:14px;
+    }
+
+    .success{
+      display:none;
+      margin-top:16px;
+      padding:14px 16px;
+      border-radius:14px;
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.18);
+      color:#bbf7d0;
+      line-height:1.9;
+      font-weight:700;
+    }
+
+    .support-login{
+      margin-top:22px;
+    }
+
+    .panel{
+      display:none;
+      margin-top:22px;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:900px;
+      background:rgba(17,24,39,.9);
+    }
+
+    th, td{
+      padding:12px 10px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      text-align:center;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    th{
+      background:rgba(239,68,68,.16);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .receipt{
+      max-width:80px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .feedback-box{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .feedback-box input{
+      width:150px;
+      padding:10px;
+      border-radius:10px;
+      font-size:13px;
+    }
+
+    .feedback-box button{
+      width:auto;
+      margin:0;
+      padding:10px 12px;
+      border-radius:10px;
+      font-size:13px;
+    }
+
+    .mini{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.8;
+    }
+
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>سامانه ثبت و ارسال آگهی</h1>
+      <p>
+        این سامانه برای ثبت اطلاعات آگهی، دریافت رسید پرداخت و انتقال درخواست به پشتیبانی طراحی شده است.
+        بعد از بررسی، آگهی شما توسط پشتیبان در کانال ثبت می‌شود.
+      </p>
+      <p>
+        <strong>هزینه ثبت هر آگهی: ۵۰٬۰۰۰ تومان</strong>
+      </p>
+
+      <div class="badge-row">
+        <span class="badge">ثبت نام و نام خانوادگی</span>
+        <span class="badge">شماره همراه</span>
+        <span class="badge">آپلود تصویر رسید</span>
+        <span class="badge">پنل پشتیبانی</span>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>فرم ارسال آگهی</h2>
+        <p class="subtext">
+          لطفاً اطلاعات را با دقت وارد کنید. پس از ثبت، درخواست شما برای بررسی پشتیبانی ذخیره می‌شود.
+        </p>
+
+        <form id="adForm">
+          <label for="name">نام</label>
+          <input type="text" id="name" placeholder="مثلاً: علی" required />
+
+          <label for="family">نام خانوادگی</label>
+          <input type="text" id="family" placeholder="مثلاً: احمدی" required />
+
+          <label for="phone">شماره همراه</label>
+          <input type="tel" id="phone" placeholder="مثلاً: 09123456789" pattern="09[0-9]{9}" required />
+
+          <label for="adType">نوع آگهی</label>
+          <select id="adType" required>
+            <option value="">انتخاب کنید...</option>
+            <option value="فروش کالا">فروش کالا</option>
+            <option value="خدمات">خدمات</option>
+            <option value="استخدام">استخدام</option>
+            <option value="ملک">ملک</option>
+            <option value="سایر">سایر</option>
+          </select>
+
+          <label for="details">توضیحات آگهی</label>
+          <textarea id="details" placeholder="جزئیات آگهی را کامل بنویسید..." required></textarea>
+
+          <label for="receipt">تصویر رسید پرداخت</label>
+          <input type="file" id="receipt" accept="image/*" required />
+
+          <div class="price-box">
+            <div>مبلغ مورد نیاز برای ثبت آگهی: <strong>۵۰٬۰۰۰ تومان</strong></div>
+            <div class="mini">پس از آپلود رسید و ثبت فرم، درخواست شما برای بررسی به پشتیبانی ارسال می‌شود.</div>
+          </div>
+
+          <div class="note">
+            <strong>اطلاع‌رسانی شفاف:</strong>
+            این سامانه درخواست آگهی را دریافت کرده و برای بررسی به پشتیبانی منتقل می‌کند.
+            ثبت نهایی آگهی پس از تأیید انجام می‌شود.
+          </div>
+
+          <button class="btn" type="submit">ثبت و ارسال آگهی</button>
+          <div id="successMessage" class="success">✅ درخواست شما با موفقیت ثبت شد و برای پشتیبانی ارسال شد.</div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>پنل پشتیبانی</h2>
+        <p class="subtext">
+          ورود پشتیبان فقط با رمز عبور انجام می‌شود.
+        </p>
+
+        <div class="support-login" id="loginBox">
+          <label for="supportPassword">رمز ورود</label>
+          <input type="password" id="supportPassword" placeholder="رمز را وارد کنید" />
+          <button class="btn secondary" onclick="checkPassword()">ورود به پنل</button>
+          <div class="warning">
+            دسترسی این بخش فقط برای پشتیبان تعریف شده است.
+          </div>
+        </div>
+
+        <div class="panel" id="supportPanel">
+          <div class="note">
+            وارد پنل شدید. در این بخش می‌توانید آگهی‌ها را مشاهده و برای هر مورد بازخورد ثبت کنید.
+          </div>
+          <button class="btn secondary" onclick="loadAds()">رفرش لیست آگهی‌ها</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="card panel" id="adsSection">
+      <h2>لیست آگهی‌های ثبت‌شده</h2>
+      <div class="table-wrap">
+        <table id="adTable">
+          <thead>
+            <tr>
+              <th>نام</th>
+              <th>نام خانوادگی</th>
+              <th>شماره همراه</th>
+              <th>نوع آگهی</th>
+              <th>توضیحات</th>
+              <th>رسید</th>
+              <th>بازخورد پشتیبان</th>
+              <th>وضعیت</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "ads_v2";
+
+    const form = document.getElementById("adForm");
+    const successMessage = document.getElementById("successMessage");
+    const adsSection = document.getElementById("adsSection");
+    const supportPanel = document.getElementById("supportPanel");
+    const loginBox = document.getElementById("loginBox");
+
+    function getAds() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    }
+
+    function saveAds(ads) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(ads));
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const family = document.getElementById("family").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const adType = document.getElementById("adType").value;
+      const details = document.getElementById("details").value.trim();
+      const receiptFile = document.getElementById("receipt").files[0];
+
+      if (!receiptFile) {
+        alert("لطفاً تصویر رسید پرداخت را بارگذاری کنید.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const receiptData = event.target.result;
+
+        const ads = getAds();
+        ads.unshift({
+          id: Date.now(),
+          name,
+          family,
+          phone,
+          adType,
+          details,
+          receiptData,
+          feedback: "",
+          status: "در انتظار بررسی",
+          createdAt: new Date().toLocaleString("fa-IR")
+        });
+
+        saveAds(ads);
+
+        form.reset();
+        successMessage.style.display = "block";
+        setTimeout(() => successMessage.style.display = "none", 4500);
+      };
+
+      reader.readAsDataURL(receiptFile);
+    });
+
+    function checkPassword() {
+      const pwd = document.getElementById("supportPassword").value;
+      if (pwd === "0101") {
+        loginBox.style.display = "none";
+        supportPanel.style.display = "block";
+        adsSection.style.display = "block";
+        loadAds();
+      } else {
+        alert("رمز وارد شده اشتباه است.");
+      }
+    }
+
+    function updateFeedback(adId) {
+      const input = document.getElementById("feedback-" + adId);
+      const feedback = input.value.trim();
+
+      const ads = getAds();
+      const index = ads.findIndex(ad => ad.id === adId);
+
+      if (index !== -1) {
+        ads[index].feedback = feedback;
+        ads[index].status = feedback ? "بازخورد ثبت شد" : "در انتظار بررسی";
+        saveAds(ads);
+        loadAds();
+      }
+    }
+
+    function loadAds() {
+      const ads = getAds();
+      const tbody = document.querySelector("#adTable tbody");
+      tbody.innerHTML = "";
+
+      if (ads.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8">هیچ آگهی‌ای ثبت نشده است.</td></tr>`;
+        return;
+      }
+
+      ads.forEach(ad => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${ad.name}</td>
+          <td>${ad.family}</td>
+          <td>${ad.phone}</td>
+          <td>${ad.adType}</td>
+          <td>${ad.details}</td>
+        <td>
+  <img src="${ad.receiptData}" class="receipt" alt="رسید">
+  <br>
+  <a href="${ad.receiptData}" download="receipt-${ad.id}.png"
+     style="color:#60a5fa; text-decoration:underline; font-size:13px; display:inline-block; margin-top:6px;">
+     دانلود رسید
+  </a>
+</td>
+
+          <td>
+            <div class="feedback-box">
+              <input type="text" id="feedback-${ad.id}" placeholder="بازخورد..." value="${ad.feedback || ""}">
+              <button class="btn secondary" onclick="updateFeedback(${ad.id})">ثبت</button>
+            </div>
+          </td>
+          <td>${ad.status || "در انتظار بررسی"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
