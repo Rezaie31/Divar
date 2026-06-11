@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ثبت آگهی | پنل پشتیبانی</title>
+  <title>ثبت آگهی | پنل ارسال و پشتیبانی</title>
   <style>
     :root{
       --bg:#0f172a;
@@ -338,40 +338,25 @@
       </div>
       <div id="supportPanel" style="display:none;">
         <div class="note">وارد پنل شدید. می‌توانید آگهی‌ها را مشاهده و خروجی بگیرید.</div>
-        <button class="btn secondary" onclick="loadAds()">رفرش لیست آگهی‌ها</button>
-        <button class="btn secondary" onclick="exportAdsToFile()">📥 خروجی گرفتن از آگهی‌ها</button>
+        <button class="btn secondary" onclick="window.open('https://docs.google.com/spreadsheets/d/12JXj1Tddq7XGAJFdliqcSr1vjU_fODBqMeF2AlffhWI/edit?gid=0#gid=0')">📥 مشاهده آگهی‌ها در گوگل شیت</button>
       </div>
     </section>
   </div>
-
-  <section class="card" id="adsSection" style="display:none;">
-    <h2>لیست آگهی‌های ثبت‌شده</h2>
-    <div class="table-wrap">
-      <table id="adTable">
-        <thead>
-          <tr>
-            <th>نام</th><th>نام خانوادگی</th><th>شماره همراه</th><th>نوع آگهی</th>
-            <th>توضیحات</th><th>رسید</th><th>بازخورد پشتیبان</th><th>وضعیت</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      无人
-    </div>
-  </section>
 </div>
 
 <script>
-  const STORAGE_KEY = "divar_ads_v2";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHc1gC78V72otSuG5UuTF8nPo-3BrcfUaFlT1SK4ZeEEyafvUBFkv712IGu3Gf559QBg/exec";
 
-  function getAds() {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
-  function saveAds(ads) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ads));
-  }
-
-  document.getElementById("adForm").addEventListener("submit", function(e) {
+  document.getElementById("adForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
     const name = document.getElementById("name").value.trim();
@@ -386,24 +371,28 @@
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      const receiptData = event.target.result;
-      const ads = getAds();
-      ads.unshift({
-        id: Date.now(),
-        name, family, phone, adType, details,
-        receiptData: receiptData,
-        feedback: "",
-        status: "در انتظار بررسی",
-        createdAt: new Date().toLocaleString("fa-IR")
+    const receiptBase64 = await fileToBase64(receiptFile);
+    const adData = {
+      name, family, phone, adType, details,
+      receipt: receiptBase64,
+      status: "در انتظار بررسی",
+      createdAt: new Date().toLocaleString("fa-IR")
+    };
+
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(adData)
       });
-      saveAds(ads);
       document.getElementById("successMessage").style.display = "block";
       setTimeout(() => document.getElementById("successMessage").style.display = "none", 4500);
       document.getElementById("adForm").reset();
-    };
-    reader.readAsDataURL(receiptFile);
+    } catch (error) {
+      console.error("خطا:", error);
+      alert("خطا در ثبت آگهی. لطفاً دوباره تلاش کنید.");
+    }
   });
 
   window.checkPassword = function() {
@@ -411,59 +400,9 @@
     if (pwd === "0101") {
       document.getElementById("loginBox").style.display = "none";
       document.getElementById("supportPanel").style.display = "block";
-      document.getElementById("adsSection").style.display = "block";
-      loadAds();
     } else {
       alert("رمز وارد شده اشتباه است.");
     }
-  };
-
-  window.loadAds = function() {
-    const ads = getAds();
-    const tbody = document.querySelector("#adTable tbody");
-    tbody.innerHTML = "";
-    if (ads.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8">هیچ آگهی‌ای ثبت نشده است.}学到了`;
-      return;
-    }
-    ads.forEach(ad => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${ad.name}</td><td>${ad.family}</td><td>${ad.phone}</td>
-        <td>${ad.adType}</td><td>${ad.details}</td>
-        <td><img src="${ad.receiptData}" class="receipt" alt="رسید"></td>
-        <td><input type="text" id="feedback-${ad.id}" placeholder="بازخورد..." value="${ad.feedback || ""}">
-            <button class="btn secondary" onclick="updateFeedback(${ad.id})">ثبت</button></td>
-        <td>${ad.status}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  };
-
-  window.updateFeedback = function(adId) {
-    const input = document.getElementById(`feedback-${adId}`);
-    const feedback = input.value.trim();
-    const ads = getAds();
-    const ad = ads.find(a => a.id === adId);
-    if (ad) {
-      ad.feedback = feedback;
-      ad.status = feedback ? "بازخورد ثبت شد" : "در انتظار بررسی";
-      saveAds(ads);
-      loadAds();
-    }
-  };
-
-  window.exportAdsToFile = function() {
-    const ads = getAds();
-    const dataStr = JSON.stringify(ads, null, 2);
-    const blob = new Blob([dataStr], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ads-backup-${new Date().toISOString()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    alert("فایل پشتیبان ذخیره شد. می‌توانی اون رو هر جا خواستی ذخیره کنی.");
   };
 </script>
 </body>
