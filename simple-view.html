@@ -2,45 +2,223 @@
 <html lang="fa">
 <head>
     <meta charset="UTF-8">
-    <title>نمایش آگهی‌ها</title>
+    <title>پنل مدیریت آگهی‌ها</title>
     <style>
-        body{font-family:Tahoma; background:#0f172a; color:white; direction:rtl; padding:20px;}
-        .card{background:#1e293b; padding:20px; border-radius:20px;}
-        table{width:100%; border-collapse:collapse;}
-        th,td{border:1px solid #475569; padding:10px; text-align:center;}
-        img{max-width:100px; border-radius:10px;}
-        .btn{background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(145deg, #0b1120 0%, #111827 100%);
+            color: #f3f4f6;
+            direction: rtl;
+            padding: 30px 20px;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 28px 24px;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1::before {
+            content: "🛡️";
+            font-size: 32px;
+            background: none;
+            -webkit-background-clip: unset;
+            color: #f97316;
+        }
+
+        .sub {
+            color: #94a3b8;
+            border-right: 3px solid #f97316;
+            padding-right: 14px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        input {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 12px 18px;
+            border-radius: 24px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(95deg, #f97316, #ea580c);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 5px 12px rgba(234, 88, 12, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
+        .refresh-btn {
+            background: #1e293b;
+            border: 1px solid #475569;
+            box-shadow: none;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn:hover {
+            background: #334155;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-top: 16px;
+            font-size: 13px;
+            background: rgba(0, 0, 0, 0.3);
+            display: block;
+            overflow-x: auto;
+        }
+
+        th {
+            background: #f97316;
+            color: #0f172a;
+            padding: 12px 8px;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #2d3a5e;
+            vertical-align: middle;
+        }
+
+        img {
+            max-width: 80px;
+            max-height: 80px;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: 0.2s;
+        }
+
+        img:hover {
+            transform: scale(1.05);
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 40px;
+            background: #1e293b70;
+            border-radius: 32px;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12px;
+            color: #4b5563;
+        }
     </style>
 </head>
 <body>
-<div class="card">
-    <h1>📋 لیست آگهی‌ها</h1>
-    <button class="btn" onclick="loadAds()">🔄 دریافت آگهی‌ها</button>
-    <div id="adsList" style="margin-top:20px;"></div>
+
+<div class="glass-card">
+    <h1>📋 پنل مدیریت آگهی‌ها</h1>
+    <div class="sub">مشاهده و پیگیری آگهی‌های دیوار اصفهان</div>
+
+    <div id="loginBox">
+        <div class="input-group">
+            <input type="password" id="adminPass" placeholder="رمز مدیریت">
+            <button class="btn" onclick="checkAdminPass()">🔐 ورود به پنل</button>
+        </div>
+    </div>
+
+    <div id="panel" style="display:none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+            <button class="btn refresh-btn" onclick="loadAds()">🔄 دریافت جدیدترین آگهی‌ها</button>
+            <button class="btn" id="exportBtn" style="background: transparent; border: 1px solid #f97316;">📥 خروجی JSON</button>
+        </div>
+        <div id="adsList" style="overflow-x: auto;"></div>
+    </div>
 </div>
+<footer>© دیوار اصفهان | پشتیبانی امن و متمرکز</footer>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgUZ3vfU6rJYSBMXun4oICctw-J8jsGgs1o95Ci9vhpVUMXe7uSIQ7sgZ5aLIYXMYpeA/exec"; // 👈 آدرس Web App جدید
+    // آدرس Web App خودت
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgUZ3vfU6rJYSBMXun4oICctw-J8jsGgs1o95Ci9vhpVUMXe7uSIQ7sgZ5aLIYXMYpeA/exec";
+
+    let currentAdsData = null;
 
     async function loadAds() {
         const container = document.getElementById("adsList");
-        container.innerHTML = "⏳ در حال بارگذاری...";
+        container.innerHTML = "<div class='empty-msg'>⏳ در حال بارگذاری آگهی‌ها...</div>";
         try {
             const res = await fetch(SCRIPT_URL);
             const text = await res.text();
-            const data = JSON.parse(text);
-            const rows = data.data;
+            const json = JSON.parse(text);
+            const rows = json.data;
             if (!rows || rows.length < 2) {
-                container.innerHTML = "<p>هیچ آگهی ثبت نشده.</p>";
+                container.innerHTML = "<div class='empty-msg'>📭 هیچ آگهی ثبت نشده است.</div>";
+                currentAdsData = null;
                 return;
             }
+            currentAdsData = rows;
             let html = '<table><thead><tr>' + rows[0].map(h => `<th>${h}</th>`).join('') + '</thead><tbody>';
             for (let i = 1; i < rows.length; i++) {
                 html += '<tr>';
                 for (let j = 0; j < rows[i].length; j++) {
                     let cell = rows[i][j];
                     if (j === 7 && cell && cell.startsWith('data:image')) {
-                        cell = `<img src="${cell}" width="80">`;
+                        cell = `<img src="${cell}" alt="رسید" loading="lazy">`;
                     }
                     html += `<td>${cell || '—'}</td>`;
                 }
@@ -48,11 +226,39 @@
             }
             html += '</tbody>樹脂';
             container.innerHTML = html;
-        } catch(e) {
-            container.innerHTML = "<p>❌ خطا در دریافت اطلاعات.</p>";
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = "<div class='empty-msg'>⚠️ خطا در دریافت اطلاعات. لطفاً چند ثانیه دیگر دوباره تلاش کنید.</div>";
+            currentAdsData = null;
         }
     }
-    loadAds();
+
+    window.checkAdminPass = () => {
+        const pwd = document.getElementById("adminPass").value;
+        if (pwd === "0101") {
+            document.getElementById("loginBox").style.display = "none";
+            document.getElementById("panel").style.display = "block";
+            loadAds();
+        } else {
+            alert("❌ رمز اشتباه است.");
+        }
+    };
+
+    document.getElementById("exportBtn")?.addEventListener("click", () => {
+        if (!currentAdsData) {
+            alert("هیچ آگهی برای خروجی گرفتن وجود ندارد.");
+            return;
+        }
+        const dataStr = JSON.stringify(currentAdsData, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ads_export_${new Date().toISOString()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        alert("✅ خروجی گرفته شد.");
+    });
 </script>
 </body>
 </html>
