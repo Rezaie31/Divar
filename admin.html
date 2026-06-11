@@ -54,30 +54,37 @@
 </div>
 
 <script>
-    // آدرس Web App جدید
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxm8KgZ0521jsJUGe-XeGbtbewDeZ_ak0EE4N9YzqeGduKPnxPksVzNSCWY6pYrxp2p/exec";
+    // آدرس Web App جدید (از آخرین Deploy)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0XxsJjUiC2KdaRh-LzSSPr6i0NukSxZzlvq5-Ts61j0jJfzVNvygazgSXPNXcAWBeA/exec";
 
     async function loadAds() {
         const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
-        if (!data || data.length < 2) {
-            document.getElementById("adsList").innerHTML = "<p>هیچ آگهی ثبت نشده.</p>";
-            return;
-        }
-        let html = '<table><thead><tr>' + data[0].map(h => `<th>${h}</th>`).join('') + '</thead><tbody>';
-        for (let i = 1; i < data.length; i++) {
-            html += '<tr>';
-            for (let j = 0; j < data[i].length; j++) {
-                let cell = data[i][j];
-                if (j === 7 && cell && cell.startsWith('data:image')) {
-                    cell = `<img src="${cell}" width="100">`;
-                }
-                html += `<td>${cell || ''}</td>`;
+        const text = await res.text();
+        try {
+            const json = JSON.parse(text);
+            const rows = json.data;
+            if (!rows || rows.length < 2) {
+                document.getElementById("adsList").innerHTML = "<p>هیچ آگهی ثبت نشده.</p>";
+                return;
             }
-            html += '</tr>';
+            let html = '<table><thead><td>' + rows[0].map(h => `<th>${h}</th>`).join('') + '</thead><tbody>';
+            for (let i = 1; i < rows.length; i++) {
+                html += '<tr>';
+                for (let j = 0; j < rows[i].length; j++) {
+                    let cell = rows[i][j];
+                    if (j === 7 && cell && cell.startsWith('data:image')) {
+                        cell = `<img src="${cell}" width="100">`;
+                    }
+                    html += `<td>${cell || ''}</td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</tbody>樹脂';
+            document.getElementById("adsList").innerHTML = html;
+        } catch(e) {
+            document.getElementById("adsList").innerHTML = "<p>خطا در دریافت اطلاعات. لطفاً چند دقیقه صبر کنید و دوباره تلاش کنید.</p>";
+            console.error(e);
         }
-        html += '</tbody>樹脂';
-        document.getElementById("adsList").innerHTML = html;
     }
 
     window.checkAdminPass = () => {
