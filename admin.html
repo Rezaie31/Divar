@@ -57,10 +57,6 @@
             font-size: 14px;
         }
 
-        .login-area, .panel-area {
-            margin-top: 10px;
-        }
-
         .input-group {
             display: flex;
             gap: 12px;
@@ -186,14 +182,13 @@
 <div style="max-width: 1300px; margin: 0 auto;">
     <div class="glass-card">
         <h1>📋 پنل مدیریت آگهی‌ها</h1>
-        <div class="sub">مشاهده، پیگیری و خروجی گرفتن از آگهی‌های دیوار اصفهان</div>
+        <div class="sub">مشاهده و پیگیری آگهی‌های دیوار اصفهان</div>
 
         <div id="loginBox">
             <div class="input-group">
-                <input type="password" id="adminPass" placeholder="رمز مدیر">
+                <input type="password" id="adminPass" placeholder="رمز مدیریت">
                 <button class="btn" onclick="checkAdminPass()">🔐 ورود به پنل</button>
             </div>
-            <div style="font-size:13px; color:#94a3b8;">🔒 رمز پیش‌فرض: 0101</div>
         </div>
 
         <div id="panel" style="display:none;">
@@ -238,7 +233,7 @@
                 }
                 html += '</tr>';
             }
-            html += '</tbody></table>';
+            html += '</tbody>閱補';
             container.innerHTML = html;
         } catch (e) {
             console.error(e);
@@ -271,7 +266,7 @@
         a.download = `ads_export_${new Date().toISOString()}.json`;
         a.click();
         URL.revokeObjectURL(url);
-        alert("✅ خروجی گرفته شد. می‌توانید فایل JSON را ذخیره کنید.");
+        alert("✅ خروجی گرفته شد.");
     });
 </script>
 </body>
