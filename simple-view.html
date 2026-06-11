@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>نمایش آگهی‌ها</title>
+    <style>
+        body{font-family:Tahoma; background:#0f172a; color:white; direction:rtl; padding:20px;}
+        .card{background:#1e293b; padding:20px; border-radius:20px;}
+        table{width:100%; border-collapse:collapse;}
+        th,td{border:1px solid #475569; padding:10px; text-align:center;}
+        img{max-width:100px; border-radius:10px;}
+        .btn{background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;}
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>📋 لیست آگهی‌ها</h1>
+    <button class="btn" onclick="loadAds()">🔄 دریافت آگهی‌ها</button>
+    <div id="adsList" style="margin-top:20px;"></div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgUZ3vfU6rJYSBMXun4oICctw-J8jsGgs1o95Ci9vhpVUMXe7uSIQ7sgZ5aLIYXMYpeA/exec"; // 👈 آدرس Web App جدید
+
+    async function loadAds() {
+        const container = document.getElementById("adsList");
+        container.innerHTML = "⏳ در حال بارگذاری...";
+        try {
+            const res = await fetch(SCRIPT_URL);
+            const text = await res.text();
+            const data = JSON.parse(text);
+            const rows = data.data;
+            if (!rows || rows.length < 2) {
+                container.innerHTML = "<p>هیچ آگهی ثبت نشده.</p>";
+                return;
+            }
+            let html = '<table><thead><tr>' + rows[0].map(h => `<th>${h}</th>`).join('') + '</thead><tbody>';
+            for (let i = 1; i < rows.length; i++) {
+                html += '<tr>';
+                for (let j = 0; j < rows[i].length; j++) {
+                    let cell = rows[i][j];
+                    if (j === 7 && cell && cell.startsWith('data:image')) {
+                        cell = `<img src="${cell}" width="80">`;
+                    }
+                    html += `<td>${cell || '—'}</td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</tbody>樹脂';
+            container.innerHTML = html;
+        } catch(e) {
+            container.innerHTML = "<p>❌ خطا در دریافت اطلاعات.</p>";
+        }
+    }
+    loadAds();
+</script>
+</body>
+</html>
