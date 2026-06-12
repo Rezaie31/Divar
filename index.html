@@ -146,6 +146,12 @@
 
     textarea{resize:vertical; min-height:120px}
 
+    .file-list{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
     .btn{
       width:100%;
       border:none;
@@ -208,40 +214,6 @@
       margin-top:22px;
     }
 
-    .table-wrap{
-      overflow:auto;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.08);
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      min-width:900px;
-      background:rgba(17,24,39,.9);
-    }
-
-    th, td{
-      padding:12px 10px;
-      border-bottom:1px solid rgba(255,255,255,.06);
-      text-align:center;
-      vertical-align:top;
-      font-size:14px;
-    }
-
-    th{
-      background:rgba(239,68,68,.16);
-      position:sticky;
-      top:0;
-      z-index:1;
-    }
-
-    .receipt{
-      max-width:80px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-    }
-
     .mini{
       font-size:12px;
       color:var(--muted);
@@ -257,12 +229,13 @@
 <div class="container">
   <section class="hero">
     <h1>سامانه ثبت و ارسال آگهی</h1>
-    <p>این سامانه برای ثبت اطلاعات آگهی، دریافت رسید پرداخت و انتقال درخواست به پشتیبانی طراحی شده است.</p>
+    <p>این سامانه برای ثبت اطلاعات آگهی و انتقال درخواست به پشتیبانی طراحی شده است.</p>
     <div class="badge-row">
       <span class="badge">ثبت نام و نام خانوادگی</span>
       <span class="badge">شماره همراه</span>
       <span class="badge">نوع آگهی</span>
       <span class="badge">توضیحات</span>
+      <span class="badge">آپلود عکس (اختیاری)</span>
       <span class="badge">پنل پشتیبانی</span>
     </div>
   </section>
@@ -270,7 +243,7 @@
   <div class="grid">
     <section class="card">
       <h2>فرم ارسال آگهی</h2>
-      <p class="subtext">لطفاً اطلاعات را با دقت وارد کنید. پس از ثبت، درخواست شما برای بررسی پشتیبانی ذخیره می‌شود.</p>
+      <p class="subtext">لطفاً اطلاعات را با دقت وارد کنید.</p>
       <form id="adForm">
         <label for="name">نام</label>
         <input type="text" id="name" placeholder="مثلاً: علی" required>
@@ -295,19 +268,20 @@
         <label for="details">توضیحات آگهی</label>
         <textarea id="details" placeholder="جزئیات آگهی را کامل بنویسید..." required></textarea>
 
-        <!-- بخش پرداختی (برای استخدام، کسب و کار و خدمات) -->
+        <label for="images">تصاویر آگهی (اختیاری، حداکثر 10 عکس)</label>
+        <input type="file" id="images" accept="image/*" multiple />
+        <div id="fileCount" class="file-list"></div>
+
         <div id="paymentSection" class="price-box hidden">
           <div><strong>💳 شماره کارت جهت واریز مبلغ:</strong></div>
-          <div dir="ltr" style="font-size:18px; font-weight:bold; color:#f97316;">6063-7312-9196-6761</div>
+          <div dir="ltr" style="font-size:18px; font-weight:bold; color:#f97316;">6037-9912-3456-7890</div>
           <div class="mini">مبلغ ثبت آگهی: <strong>۵۰٬۰۰۰ تومان</strong></div>
-          <div class="mini">پس از واریز، تصویر رسید را در قسمت زیر آپلود کنید.
-          به نام رضائی.</div>
+          <div class="mini">پس از واریز، تصویر رسید را در قسمت زیر آپلود کنید.</div>
           
-          <label for="receipt" style="margin-top:12px;">تصویر رسید پرداخت</label>
+          <label for="receipt">تصویر رسید پرداخت</label>
           <input type="file" id="receipt" accept="image/*" />
         </div>
 
-        <!-- بخش رایگان (برای سایر موارد) -->
         <div id="freeSection" class="price-box hidden">
           <div><strong>✅ آگهی شما رایگان می‌باشد</strong></div>
           <div class="mini">نیازی به پرداخت هزینه نیست. آگهی شما پس از بررسی در کانال قرار می‌گیرد.</div>
@@ -339,28 +313,36 @@
 </div>
 
 <script>
-  // آدرس Web App جدید
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgUZ3vfU6rJYSBMXun4oICctw-J8jsGgs1o95Ci9vhpVUMXe7uSIQ7sgZ5aLIYXMYpeA/exec";
 
-  // عناصر DOM
   const adTypeSelect = document.getElementById("adType");
   const paymentSection = document.getElementById("paymentSection");
   const freeSection = document.getElementById("freeSection");
   const receiptInput = document.getElementById("receipt");
+  const imagesInput = document.getElementById("images");
+  const fileCountDiv = document.getElementById("fileCount");
   const submitBtn = document.getElementById("submitBtn");
   const successMsg = document.getElementById("successMessage");
 
-  // نمایش/عدم نمایش بخش‌ها بر اساس نوع آگهی
+  imagesInput.addEventListener("change", function() {
+    const count = this.files.length;
+    if(count > 10) {
+      alert("حداکثر 10 عکس می‌توانید انتخاب کنید.");
+      this.value = "";
+      fileCountDiv.innerHTML = "";
+    } else {
+      fileCountDiv.innerHTML = count > 0 ? `${count} فایل انتخاب شده` : "";
+    }
+  });
+
   function togglePaymentFields() {
     const selectedType = adTypeSelect.value;
-    // استخدام، کسب و کار و خدمات نیاز به پرداخت دارند
     const paidTypes = ["استخدام", "کسب و کار", "خدمات"];
     if (paidTypes.includes(selectedType)) {
       paymentSection.classList.remove("hidden");
       freeSection.classList.add("hidden");
       receiptInput.required = true;
     } else if (selectedType !== "") {
-      // سایر موارد رایگان
       paymentSection.classList.add("hidden");
       freeSection.classList.remove("hidden");
       receiptInput.required = false;
@@ -383,6 +365,15 @@
     });
   }
 
+  async function convertFilesToBase64(files) {
+    const base64Array = [];
+    for(let i = 0; i < Math.min(files.length, 10); i++) {
+      const base64 = await fileToBase64(files[i]);
+      base64Array.push(base64);
+    }
+    return base64Array;
+  }
+
   document.getElementById("adForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
@@ -392,28 +383,28 @@
     const adType = adTypeSelect.value;
     const details = document.getElementById("details").value.trim();
     const receiptFile = receiptInput.files[0];
+    const imageFiles = imagesInput.files;
 
-    // بررسی الزام آپلود رسید برای نوع‌های پرداختی
     const paidTypes = ["استخدام", "کسب و کار", "خدمات"];
     if (paidTypes.includes(adType) && !receiptFile) {
       alert("لطفاً تصویر رسید پرداخت را بارگذاری کنید.");
       return;
     }
 
-    // تغییر دکمه در حال ارسال
     const originalBtnText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML = "⏳ در حال ثبت آگهی، لطفاً صبر کنید...";
     successMsg.style.display = "none";
 
     let receiptBase64 = "";
-    if (receiptFile) {
-      receiptBase64 = await fileToBase64(receiptFile);
-    }
+    if (receiptFile) receiptBase64 = await fileToBase64(receiptFile);
+    
+    const imagesBase64 = await convertFilesToBase64(imageFiles);
 
     const adData = {
       name, family, phone, adType, details,
       receipt: receiptBase64 || "رایگان - نیازی به رسید نیست",
+      images: imagesBase64,
       status: "در انتظار بررسی",
       createdAt: new Date().toLocaleString("fa-IR")
     };
@@ -427,10 +418,9 @@
       });
       successMsg.style.display = "block";
       document.getElementById("adForm").reset();
-      togglePaymentFields(); // بازنشانی وضعیت نمایش
-      setTimeout(() => {
-        successMsg.style.display = "none";
-      }, 5000);
+      fileCountDiv.innerHTML = "";
+      togglePaymentFields();
+      setTimeout(() => successMsg.style.display = "none", 5000);
     } catch (error) {
       console.error("خطا:", error);
       alert("خطا در ثبت آگهی. لطفاً دوباره تلاش کنید.");
