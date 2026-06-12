@@ -139,12 +139,24 @@
             vertical-align: middle;
         }
 
-        img {
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .gallery-img {
             max-width: 80px;
             max-height: 80px;
-            border-radius: 16px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,.2);
             cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .gallery-img:hover {
+            transform: scale(1.05);
         }
 
         .btn-small {
@@ -169,24 +181,6 @@
             background: #ef4444;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            background: #f59e0b;
-            color: #0f172a;
-        }
-
-        .status-confirmed {
-            background: #22c55e;
-            color: #0f172a;
-        }
-
         .empty-msg {
             text-align: center;
             padding: 40px;
@@ -207,7 +201,7 @@
 
 <div class="glass-card">
     <h1>📋 پنل مدیریت آگهی‌ها</h1>
-    <div class="sub">مشاهده، تأیید، حذف و دانلود رسید آگهی‌ها</div>
+    <div class="sub">مشاهده، تأیید، حذف و دانلود تصاویر آگهی‌ها</div>
 
     <div id="loginBox">
         <div class="input-group">
@@ -229,78 +223,41 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgUZ3vfU6rJYSBMXun4oICctw-J8jsGgs1o95Ci9vhpVUMXe7uSIQ7sgZ5aLIYXMYpeA/exec";
     let currentAdsData = null;
-    let sheetId = null;
 
-    // استخراج Sheet ID از URL (برای حذف)
-    function extractSheetId(url) {
-        const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
-        return match ? match[1] : null;
-    }
-
-    // حذف یک ردیف از Google Sheets
-    async function deleteRowFromSheet(rowIndex) {
-        if (!sheetId) {
-            const sheetUrl = prompt("لطفاً لینک Google Sheets خود را وارد کنید:", "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit");
-            if (sheetUrl) {
-                sheetId = extractSheetId(sheetUrl);
-                if (!sheetId) {
-                    alert("لینک شیت معتبر نیست.");
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        }
-        
-        // استفاده از Google Sheets API v4 برای حذف ردیف
-        // توجه: این نیاز به API Key با دسترسی به Sheets API دارد
-        // به صورت ساده‌تر، از روش جایگزین استفاده می‌کنیم: ذخیره مجدد کل داده‌ها بدون ردیف حذف شده
-        try {
-            // حذف ردیف از داده محلی
-            currentAdsData.splice(rowIndex, 1);
-            
-            // ذخیره مجدد کل داده‌ها در Web App
-            // ابتدا دیتا رو آماده می‌کنیم
-            const newData = { data: currentAdsData };
-            
-            // درخواست به یک endpoint جدید برای بازنویسی کل شیت
-            // این بخش نیاز به Web App جداگانه داره، فعلاً از روش ساده استفاده می‌کنیم
-            alert("⚠️ حذف دائمی آگهی نیاز به تنظیمات بیشتر داره. فعلاً آگهی از جدول حذف شد ولی از گوگل شیت پاک نمی‌شه.");
-            renderTable(currentAdsData);
-            return true;
-        } catch(e) {
-            console.error("خطا در حذف:", e);
-            alert("خطا در حذف آگهی");
-            return false;
-        }
-    }
-
-    // تابع دانلود عکس
     function downloadImage(base64String, index) {
         const link = document.createElement('a');
         link.href = base64String;
-        link.download = `receipt_${Date.now()}_${index}.png`;
+        link.download = `image_${Date.now()}_${index}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
 
-    // تابع تأیید آگهی
-    async function confirmAd(rowIndex) {
+    function confirmAd(rowIndex) {
         if (!currentAdsData || rowIndex >= currentAdsData.length) return;
-        
         currentAdsData[rowIndex][6] = "تأیید شده";
         renderTable(currentAdsData);
         alert(`✅ آگهی شماره ${rowIndex} تأیید شد.`);
     }
 
-    // تابع حذف آگهی
-    async function deleteAd(rowIndex) {
+    function deleteAd(rowIndex) {
         if (!currentAdsData || rowIndex >= currentAdsData.length) return;
-        
         if (confirm(`آیا از حذف این آگهی مطمئن هستید؟`)) {
-            await deleteRowFromSheet(rowIndex);
+            currentAdsData.splice(rowIndex, 1);
+            renderTable(currentAdsData);
+            alert("آگهی حذف شد.");
         }
+    }
+
+    function renderGallery(images) {
+        if (!images || images.length === 0) return "—";
+        let html = '<div class="gallery">';
+        images.forEach((img, idx) => {
+            html += `<img src="${img}" class="gallery-img" onclick="window.open('${img}')" title="تصویر ${idx+1}">`;
+            html += `<button class="btn-small download" onclick="downloadImage('${img}', ${idx})">📥</button>`;
+        });
+        html += '</div>';
+        return html;
     }
 
     function renderTable(rows) {
@@ -309,40 +266,52 @@
             container.innerHTML = "<div class='empty-msg'>📭 هیچ آگهی ثبت نشده است.</div>";
             return;
         }
-        
+
         let html = '<table><thead><tr>';
-        rows[0].forEach(h => {
-            html += `<th>${h}</th>`;
-        });
+        rows[0].forEach(h => html += `<th>${h}</th>`);
         html += '<th>عملیات</th></thead><tbody>';
-        
+
         for (let i = 1; i < rows.length; i++) {
             html += '<tr>';
             for (let j = 0; j < rows[i].length; j++) {
                 let cell = rows[i][j];
-                if (j === 7 && cell && cell.startsWith('data:image')) {
-                    cell = `
-                        <div style="display:flex; flex-direction:column; gap:5px; align-items:center;">
-                            <img src="${cell}" width="80" style="cursor:pointer;" onclick="window.open('${cell}')">
-                            <button class="btn-small download" onclick="downloadImage('${cell}', ${i})">📥 دانلود</button>
-                        </div>
-                    `;
+                if (j === 7 && cell && (cell.startsWith('data:image') || cell.includes('data:image'))) {
+                    // رسید
+                    cell = `<div style="text-align:center;"><img src="${cell}" width="60" style="border-radius:8px;"><br><button class="btn-small download" onclick="downloadImage('${cell}', 0)">📥 دانلود رسید</button></div>`;
+                } else if (j === 8 && cell) {
+                    // گالری عکس‌ها
+                    try {
+                        const images = JSON.parse(cell);
+                        cell = renderGallery(images);
+                    } catch(e) {
+                        cell = "—";
+                    }
                 }
                 html += `<td>${cell || '—'}</td>`;
             }
             const status = rows[i][6] || "در انتظار بررسی";
             const isConfirmed = status === "تأیید شده";
             html += `<td>
-                <div style="display:flex; gap:5px; justify-content:center;">
-                    <button class="btn-small confirm" onclick="confirmAd(${i})" ${isConfirmed ? 'disabled' : ''}>
-                        ${isConfirmed ? '✅ تأیید شده' : '✔️ ثبت شد'}
-                    </button>
-                    <button class="btn-small delete" onclick="deleteAd(${i})">
-                        🗑️ حذف
-                    </button>
-                </div>
-              </td>`;
-            html += '<tr>';
+                <button class="btn-small confirm" onclick="confirmAd(${i})" ${isConfirmed ? 'disabled' : ''}>
+                    ${isConfirmed ? '✅ تأیید شده' : '✔️ ثبت شد'}
+                </button>
+                <button class="btn-small delete" onclick="deleteAd(${i})">🗑️ حذف</button>
+              </div>
+            </div>
+           </div>
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+
+                                `;
+            html += '</tr>';
         }
         html += '</tbody>閱補';
         container.innerHTML = html;
