@@ -221,13 +221,14 @@
 <footer>© دیوار اصفهان | پشتیبانی امن و متمرکز</footer>
 
 <script>
+    // آدرس Web App خودت رو اینجا بذار
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgUZ3vfU6rJYSBMXun4oICctw-J8jsGgs1o95Ci9vhpVUMXe7uSIQ7sgZ5aLIYXMYpeA/exec";
     let currentAdsData = null;
 
-    function downloadImage(base64String, index) {
+    function downloadImage(base64String, name) {
         const link = document.createElement('a');
         link.href = base64String;
-        link.download = `image_${Date.now()}_${index}.png`;
+        link.download = `image_${Date.now()}_${name}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -235,17 +236,19 @@
 
     function confirmAd(rowIndex) {
         if (!currentAdsData || rowIndex >= currentAdsData.length) return;
-        currentAdsData[rowIndex][6] = "تأیید شده";
-        renderTable(currentAdsData);
-        alert(`✅ آگهی شماره ${rowIndex} تأیید شد.`);
+        if (confirm(`آیا آگهی "${currentAdsData[rowIndex][1]} ${currentAdsData[rowIndex][2]}" تأیید شود؟`)) {
+            currentAdsData[rowIndex][8] = "تأیید شده";
+            renderTable(currentAdsData);
+            alert("✅ آگهی تأیید شد.");
+        }
     }
 
     function deleteAd(rowIndex) {
         if (!currentAdsData || rowIndex >= currentAdsData.length) return;
-        if (confirm(`آیا از حذف این آگهی مطمئن هستید؟`)) {
+        if (confirm(`آیا از حذف آگهی "${currentAdsData[rowIndex][1]} ${currentAdsData[rowIndex][2]}" مطمئن هستید؟`)) {
             currentAdsData.splice(rowIndex, 1);
             renderTable(currentAdsData);
-            alert("آگهی حذف شد.");
+            alert("🗑️ آگهی حذف شد.");
         }
     }
 
@@ -267,29 +270,59 @@
             return;
         }
 
-        let html = '<table><thead><tr>';
-        rows[0].forEach(h => html += `<th>${h}</th>`);
-        html += '<th>عملیات</th></thead><tbody>';
+        let html = `<table><thead><tr>`;
+        // هدرها
+        const headers = ["زمان", "نام", "نام خانوادگی", "تلفن", "نوع آگهی", "توضیحات", "رسید", "تصاویر", "وضعیت", "عملیات"];
+        headers.forEach(h => html += `<th>${h}</th>`);
+        html += `</thead><tbody>`;
 
         for (let i = 1; i < rows.length; i++) {
-            html += '<tr>';
-            for (let j = 0; j < rows[i].length; j++) {
-                let cell = rows[i][j];
-                if (j === 7 && cell && (cell.startsWith('data:image') || cell.includes('data:image'))) {
-                    // رسید
-                    cell = `<div style="text-align:center;"><img src="${cell}" width="60" style="border-radius:8px;"><br><button class="btn-small download" onclick="downloadImage('${cell}', 0)">📥 دانلود رسید</button></div>`;
-                } else if (j === 8 && cell) {
-                    // گالری عکس‌ها
-                    try {
-                        const images = JSON.parse(cell);
-                        cell = renderGallery(images);
-                    } catch(e) {
-                        cell = "—";
-                    }
-                }
-                html += `<td>${cell || '—'}</td>`;
+            const row = rows[i];
+            html += `<tr>`;
+            
+            // ستون 0: زمان
+            html += `<td>${row[0] || '—'}('`;
+            
+            // ستون 1: نام
+            html += `<td>${row[1] || '—'}('`;
+            
+            // ستون 2: نام خانوادگی
+            html += `<td>${row[2] || '—'}('`;
+            
+            // ستون 3: تلفن
+            html += `<td>${row[3] || '—'}('`;
+            
+            // ستون 4: نوع آگهی
+            html += `<td>${row[4] || '—'}('`;
+            
+            // ستون 5: توضیحات
+            html += `<td>${row[5] || '—'}('`;
+            
+            // ستون 6: رسید
+            let receiptCell = row[6] || "—";
+            if (receiptCell.startsWith('data:image')) {
+                receiptCell = `<div style="text-align:center;"><img src="${receiptCell}" width="60" style="border-radius:8px;"><br>
+                              <button class="btn-small download" onclick="downloadImage('${receiptCell}', 'receipt')">📥 دانلود رسید</button></div>`;
             }
-            const status = rows[i][6] || "در انتظار بررسی";
+            html += `<td>${receiptCell}('`;
+            
+            // ستون 7: تصاویر (گالری)
+            let imagesCell = "—";
+            if (row[7]) {
+                try {
+                    const images = JSON.parse(row[7]);
+                    imagesCell = renderGallery(images);
+                } catch(e) {
+                    imagesCell = "—";
+                }
+            }
+            html += `<td>${imagesCell}('`;
+            
+            // ستون 8: وضعیت
+            const status = row[8] || "در انتظار بررسی";
+            html += `<td>${status}('`;
+            
+            // ستون 9: عملیات (دکمه‌ها)
             const isConfirmed = status === "تأیید شده";
             html += `<td>
                 <button class="btn-small confirm" onclick="confirmAd(${i})" ${isConfirmed ? 'disabled' : ''}>
@@ -300,6 +333,7 @@
             </div>
            </div>
           </div>
+         </div>
         </div>
        </div>
       </div>
@@ -309,11 +343,10 @@
   </div>
  </div>
 </div>
-
-                                `;
-            html += '</tr>';
+                            `;
+            html += `</tr>`;
         }
-        html += '</tbody>閱補';
+        html += `</tbody>樹脂`;
         container.innerHTML = html;
     }
 
